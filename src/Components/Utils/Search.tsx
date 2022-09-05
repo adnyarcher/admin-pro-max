@@ -23,6 +23,7 @@ const Search = ({SearchResult, onSelect, placeholder, defaultValue}: {SearchResu
         }
 
     };
+    
     const optimizedFn = useCallback(debounce(handleSearch), []);
     // const onSelect = (value: any, {valId}: {valId: number | undefined}) => {
     //     findDailiesByCompany(valId)

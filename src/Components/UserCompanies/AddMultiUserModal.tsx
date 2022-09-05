@@ -15,7 +15,6 @@ const AddMultiUserModal = ({ isModalVisible, setIsModalVisible, userId, companyI
         }
         setIsModalVisible(false);
     };
-
     const handleCancel = () => {
         setIsModalVisible(false);
     };
