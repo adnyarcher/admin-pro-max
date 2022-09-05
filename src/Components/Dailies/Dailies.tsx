@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {dailies} from "../../API/Dailies/daily";
+// import {dailies} from "../../API/Dailies/daily";
 import {useDailiesData} from "../../Hooks/Dailies";
 import DaliesListTable from "./DaliesListTable";
 import moment from "moment";

@@ -1,17 +1,18 @@
 import React, {useState} from 'react';
-import {Col, Input, Row, Select, Space, Spin, Switch} from "antd";
+import {Col, DatePicker, Input, Row, Select, Space, Spin, Switch} from "antd";
 import {Field} from "react-final-form";
 import Search from "../../Utils/Search";
 import {SearchResultForCompany, SearchResultForVehicle} from "../../Utils/SearchResults";
 import {useCompanyData, useVehicleData} from "../../../Hooks/Companies";
 import {usStates} from "../../Utils/data";
+import moment from 'moment';
 
 const { Option } = Select;
 const MainFields = ({ data }: { data: any }) => {
     const [check, setCheck] = useState(false);
     const myComp = useCompanyData(data.companyId);
     const myVehicle = useVehicleData(data.vehicleId);
-    console.log(myVehicle.data)
+    console.log(data)
     return !myComp.isLoading && !myVehicle.isLoading ? (
         <div>
             <Space direction="vertical" size="middle" style={{display: 'flex'}}>
@@ -45,10 +46,10 @@ const MainFields = ({ data }: { data: any }) => {
                                 name="companyId"
                                 render={({input}: { input: any }) => (
                                     <>
-                                        {check ? <Search SearchResult={SearchResultForCompany} onSelect={(value: any, {valId}: {valId: number | undefined}) => {
+                                        {(check || !myComp?.data?.name) ? <Search SearchResult={SearchResultForCompany} onSelect={(value: any, {valId}: {valId: number | undefined}) => {
                                                 input.onChange(valId)
-                                            }} placeholder={"Companies"} defaultValue={myComp.data.name} /> :
-                                            <div onClick={() => data.role === 'dispatcher' && setCheck(true)}><h1 style={{margin: 0}}>{myComp.data.name}</h1></div>
+                                            }} placeholder={"Companies"} defaultValue={myComp?.data?.name} /> :
+                                            <div onClick={() => data.role === 'dispatcher' && setCheck(true)}><h1 style={{margin: 0}}>{myComp?.data?.name}</h1></div>
                                         }
                                     </>
                                 )}
@@ -61,13 +62,7 @@ const MainFields = ({ data }: { data: any }) => {
                             <Field
                                 name="role"
                                 render={({input}: { input: any }) => (
-                                    <Select defaultValue={input.value} onChange={(value, option) => {
-                                        input.onChange(value)
-                                    }} style={{width: '100%'}}>
-                                        <Option key={'driver'}>Driver</Option>
-                                        <Option key={'dispatcher'}>Dispatcher</Option>
-                                        <Option key={'admin'}>Admin</Option>
-                                    </Select>
+                                    <h1 style={{textTransform: 'uppercase'}}>{input.value}</h1>
                                 )}
                             />
                         </div>
@@ -85,7 +80,7 @@ const MainFields = ({ data }: { data: any }) => {
                             />
                         </div>
                     </Col>
-                    <Col span={6}>
+                    {data.role !== 'driver' && <Col span={6}>
                         <div>
                             <label>Is Owner: </label>
                             <Field
@@ -95,8 +90,8 @@ const MainFields = ({ data }: { data: any }) => {
                                 )}
                             />
                         </div>
-                    </Col>
-                    <Col span={6}>
+                    </Col>}
+                    {data.role !== 'driver' && <Col span={6}>
                         <div>
                             <label>Is Support: </label>
                             <Field
@@ -106,7 +101,7 @@ const MainFields = ({ data }: { data: any }) => {
                                 )}
                             />
                         </div>
-                    </Col>
+                    </Col>}
                     <Col span={6}>
                         <div>
                             <label>Email Verified: </label>
@@ -244,9 +239,23 @@ const MainFields = ({ data }: { data: any }) => {
                         )}
                     />
                 </div>
+                {data?.role === 'driver' && <div>
+                    <label>Activated: </label><br />
+                    <Field
+                        name="activated"
+                        render={({input}: { input: any }) => {
+                            return <DatePicker defaultValue={moment(input.value)} format={'YYYY-MM-DD'} disabledDate={(current) => {
+                                let customDate = moment().add(1, 'd').format("YYYY-MM-DD");
+                                return current && current > moment(customDate, "YYYY-MM-DD");
+                            }} onChange={(date: any, dateString: any) => {
+                                input.onChange(moment.utc(dateString, 'YYYY-MM-DD').add(11, 'hour').toISOString())
+                            }} />
+                        }}
+                    />
+                </div>}
             </Space>
         </div>
-    ) : <Spin size="large" spinning={!myComp.data}></Spin>
+    ) : <Spin size="large" spinning={myComp?.isLoading}></Spin>
 };
 
 export default MainFields;
