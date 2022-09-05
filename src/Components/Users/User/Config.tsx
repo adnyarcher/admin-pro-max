@@ -13,7 +13,7 @@ const Config = () => {
         <div>
             <Space direction="vertical" size="middle" style={{display: 'flex', width: '50%'}}>
                 {configs.map(config => {
-                    return data.role !== config.case && <div>
+                    return data.role === config.case && <div>
                         <Field
                             name={`config.${config}`}
                             render={({input}: { input: any }) => (
